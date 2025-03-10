@@ -1,9 +1,12 @@
 import os
+from inspect import ClassFoundException
+
 import math
 #ayo deneme
 #
 #adhakejfhkjahekffjakfjakjf
-#
+#wlkfdjh;kjhf;kj
+fjakjdsf;ClassFoundException
 #asfnlansflaniggasasgag
 #
 

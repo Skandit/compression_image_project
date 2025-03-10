@@ -18,26 +18,38 @@ def main():
     compressed_file = lzw.compress_text_file()
     print(f"Compression complete: {compressed_file}")
 
+    # Calculate original and compressed file sizes
+    original_size = os.path.getsize(filename + ".txt")
+    compressed_size = os.path.getsize(compressed_file)
+
+    # Calculate compression ratio
+    compression_ratio = compressed_size / original_size if original_size > 0 else 0
+    code_length = len(bin(compressed_size)[2:])  # Approximate code length in bits
+
+    print("\nCompression Statistics:")
+    print(f"Original File Size: {original_size} bytes")
+    print(f"Compressed File Size: {compressed_size} bytes")
+    print(f"Compression Ratio: {compression_ratio:.4f}")
+    print(f"Calculated Code Length: {code_length} bits")
+
     # Decompress the file
     decompressed_file = lzw.decompress_text_file()
     print(f"Decompression complete: {decompressed_file}")
 
     # Compare file sizes
-    original_size = os.path.getsize(filename + ".txt")
-    compressed_size = os.path.getsize(compressed_file)
     decompressed_size = os.path.getsize(decompressed_file)
-
     print("\nFile Size Report:")
-    print(f"Original file size: {original_size} bytes")
-    print(f"Compressed file size: {compressed_size} bytes")
-    print(f"Decompressed file size: {decompressed_size} bytes")
+    print(f"Decompressed File Size: {decompressed_size} bytes")
 
-    # Check if decompression was successful
-    with open(filename + ".txt", "r") as f1, open(decompressed_file, "r") as f2:
-        if f1.read() == f2.read():
-            print("Decompression successful! File matches original.")
+    # Compare original and decompressed files to verify correctness
+    with open(filename + ".txt", 'r') as orig_file, open(decompressed_file, 'r') as decomp_file:
+        original_content = orig_file.read()
+        decompressed_content = decomp_file.read()
+        if original_content == decompressed_content:
+            print("\nVerification: SUCCESS - The decompressed file matches the original.")
         else:
-            print("Decompression failed! Files do not match.")
+            print("\nVerification: FAILURE - The decompressed file does NOT match the original.")
+
 
 if __name__ == "__main__":
     main()

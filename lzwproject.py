@@ -3,7 +3,7 @@ from inspect import ClassFoundException
 
 import math
 
-
+akjhfkja
 
 class LZWCode:
     def __init__(self, filename, data_type):

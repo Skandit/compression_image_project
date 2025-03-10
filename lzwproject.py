@@ -2,8 +2,7 @@ import os
 from inspect import ClassFoundException
 
 import math
-
-akjhfkja
+afafs
 
 class LZWCode:
     def __init__(self, filename, data_type):

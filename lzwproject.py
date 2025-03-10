@@ -2,30 +2,24 @@ import os
 from inspect import ClassFoundException
 
 import math
-afafs
 
-
-
-
-aasdashglfkjh
 
 class LZWCode:
     def __init__(self, filename, data_type):
         self.filename = filename
         self.data_type = data_type
 
-
     def compress_text_file(self):
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        input_file = self.filename + ".txt"
-        input_path = current_dir + "/" + input_file
-
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        input_file = self.filename + '.txt'
+        input_path = current_directory + '/' + input_file
         output_file = self.filename + '.bin'
-        output_path = current_dir + '/' + output_file
+        output_path = current_directory + '/' + output_file
 
         in_file = open(input_path, 'r')
         text = in_file.read().rstrip()
         in_file.close()
+
         encoded_text_as_integers = self.encode(text)
         encoded_text = self.int_list_to_binary_string(encoded_text_as_integers)
         encoded_text = self.add_code_length_info(encoded_text)
@@ -36,41 +30,35 @@ class LZWCode:
         out_file.write(bytes(byte_array))
         out_file.close()
 
-        print( input_file + " is compressed into " + output_file +".")
+        print(f"{input_file} is compressed into {output_file}.")
         return output_path
 
     def encode(self, uncompressed_data):
-        dict_size = 511  # Support -255 to 255 mapped to 0-510
-        dictionary = {str(i): i + 255 for i in range(-255, 256)}  # Store keys as strings
+        dict_size = 256
+        dictionary = {chr(i): i for i in range(dict_size)}
 
         w = ''
         result = []
-        max_dict_size = 2 ** 12  # Limit dictionary size to avoid excessive growth
-
-        for char in uncompressed_data:
-            char = str(char)  # ✅ Convert number to string
-            wchar = w + char
-            if wchar in dictionary:
-                w = wchar
+        for k in uncompressed_data:
+            wk = w + k
+            if wk in dictionary:
+                w = wk
             else:
                 result.append(dictionary[w])
-                if dict_size < max_dict_size:
-                    dictionary[wchar] = dict_size
-                    dict_size += 1
-                w = char
-
+                dictionary[wk] = dict_size
+                dict_size += 1
+                w = k
         if w:
             result.append(dictionary[w])
 
-        self.codelength = max(9, math.ceil(math.log2(len(dictionary))))
-
+        self.codelength = math.ceil(math.log2(len(dictionary)))
         return result
 
     def int_list_to_binary_string(self, int_list):
         bitstring = ''
         for num in int_list:
             for n in range(self.codelength):
-                if num&(1<<(self.codelength - n - 1)):
+                if num & (1 << (self.codelength - 1 - n)):
                     bitstring += '1'
                 else:
                     bitstring += '0'
@@ -104,12 +92,11 @@ class LZWCode:
         return b
 
     def decompress_text_file(self):
-        current_dir = os.path.dirname(os.path.realpath(__file__))
+        current_directory = os.path.dirname(os.path.realpath(__file__))
         input_file = self.filename + '.bin'
-        input_path = current_dir + '/' + input_file
-
+        input_path = current_directory + '/' + input_file
         output_file = self.filename + '_decompressed.txt'
-        output_path = current_dir + '/' + output_file
+        output_path = current_directory + '/' + output_file
 
         in_file = open(input_path, 'rb')
         bytes = in_file.read()
@@ -191,7 +178,6 @@ class LZWCode:
             int_codes.append(int_code)
 
         return int_codes
-
 
 
 

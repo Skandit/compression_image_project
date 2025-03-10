@@ -4,6 +4,11 @@ from inspect import ClassFoundException
 import math
 afafs
 
+
+
+
+aasdashglfkjh
+
 class LZWCode:
     def __init__(self, filename, data_type):
         self.filename = filename

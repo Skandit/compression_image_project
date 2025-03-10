@@ -41,7 +41,7 @@ def main():
     print("\nFile Size Report:")
     print(f"Decompressed File Size: {decompressed_size} bytes")
 
-    # Compare original and decompressed files to verify correctness
+    # Compare original and decompressed files to verify correctnesss
     with open(filename + ".txt", 'r') as orig_file, open(decompressed_file, 'r') as decomp_file:
         original_content = orig_file.read()
         decompressed_content = decomp_file.read()

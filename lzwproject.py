@@ -1,6 +1,11 @@
 import os
 import math
 #ayo deneme
+#
+#adhakejfhkjahekffjakfjakjf
+#
+#asfnlansflaniggasasgag
+#
 
 class LZWCode:
     def __init__(self, filename, data_type):

@@ -4,8 +4,7 @@ from lzwproject import LZWCode  # Import your LZW class
 
 def main():
     # Ask user for file name (without extension)
-    filename = input("Enter the name of the file (without extension): ")
-
+    filename = "sample"
     # Ensure the file exists
     if not os.path.exists(filename + ".txt"):
         print("Error: File not found!")

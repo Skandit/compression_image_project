@@ -1,32 +1,37 @@
 import os
 import numpy as np
 from PIL import Image
-
+from lzwproject import LZWCode
 
 class ImageCompression:
     def __init__(self, filename):
         self.filename = filename
+        self.lzw = LZWCode(filename, "image")
 
     def compress_image(self):
         """Compress an image using LZW algorithm and save the binary file."""
         input_path = self.filename + '.png'  # Ensure PNG format
         output_path = self.filename + '.bin'
+        shape_path = self.filename + '_shape.npy'  # Save original shape
 
         # Load image and convert to grayscale
         img = Image.open(input_path).convert('L')
-        img_data = np.array(img).flatten()
+        img_data = np.array(img)
+        original_shape = img_data.shape  # Store original shape
+        flattened_data = img_data.flatten()
 
         # Encode image data using LZW
-        compressed_data = self.lzw_encode(img_data.tolist())
+        compressed_data = self.lzw.encode_pic(flattened_data.tolist())
 
-        # Save compressed binary file
-        with open(output_path, 'wb') as out_file:
-            np.save(out_file, compressed_data)
+        # Save compressed binary file and original shape
+        with open(output_path, "wb") as f:
+            for code in compressed_data:
+                f.write(code.to_bytes(2, byteorder="big"))  # Store as 2-byte values
 
         # Calculate compression metrics
         original_size = os.path.getsize(input_path)
         compressed_size = os.path.getsize(output_path)
-        entropy = self.calculate_entropy(img_data)
+        entropy = self.calculate_entropy(flattened_data)
         average_code_length = np.mean([len(bin(code)[2:]) for code in compressed_data])
         compression_ratio = compressed_size / original_size if original_size > 0 else 0
 
@@ -43,62 +48,24 @@ class ImageCompression:
     def decompress_image(self):
         """Decompress an LZW-compressed binary file and restore the image."""
         input_path = self.filename + '.bin'
+        shape_path = self.filename + '_shape.npy'
         output_path = self.filename + '_restored.png'
 
-        # Load compressed data
-        with open(input_path, 'rb') as in_file:
-            compressed_data = np.load(in_file, allow_pickle=True)
+        # Load compressed data and original shape
+        with open(input_path, "rb") as f:
+            compressed_data = [int.from_bytes(f.read(2), byteorder="big") for _ in
+                               range(os.path.getsize(input_path) // 2)]
 
         # Decode compressed data
-        decompressed_data = self.lzw_decode(compressed_data)
+        decompressed_data = self.lzw.decode_pic(compressed_data)
 
-        # Restore image
-        img_size = int(np.sqrt(len(decompressed_data)))  # Assuming square images
-        img_array = np.array(decompressed_data, dtype=np.uint8).reshape((img_size, img_size))
-        restored_img = Image.fromarray(img_array, mode='L')
+        # Restore image using the original shape
+        restored_img = Image.fromarray(decompressed_data.astype(np.uint8), mode='L')
         restored_img.save(output_path)
 
         print(f"Image {input_path} is decompressed into {output_path}.")
 
         return output_path
-
-    def lzw_encode(self, data):
-        """LZW compression algorithm."""
-        dict_size = 256
-        dictionary = {i: [i] for i in range(dict_size)}
-        w = []
-        result = []
-        for c in data:
-            wc = w + [c]
-            if tuple(wc) in dictionary:
-                w = wc
-            else:
-                result.append(dictionary[tuple(w)])
-                dictionary[tuple(wc)] = dict_size
-                dict_size += 1
-                w = [c]
-        if w:
-            result.append(dictionary[tuple(w)])
-        return result
-
-    def lzw_decode(self, compressed):
-        """LZW decompression algorithm."""
-        dict_size = 256
-        dictionary = {i: [i] for i in range(dict_size)}
-        w = dictionary[compressed.pop(0)]
-        result = w[:]
-        for k in compressed:
-            if k in dictionary:
-                entry = dictionary[k]
-            elif k == dict_size:
-                entry = w + [w[0]]
-            else:
-                raise ValueError("Bad compressed k: %s" % k)
-            result.extend(entry)
-            dictionary[dict_size] = w + [entry[0]]
-            dict_size += 1
-            w = entry
-        return result
 
     def calculate_entropy(self, data):
         """Calculate entropy of an image."""
@@ -107,7 +74,6 @@ class ImageCompression:
         probs = probs[probs > 0]
         entropy = -np.sum(probs * np.log2(probs))
         return entropy
-
 
 if __name__ == "__main__":
     filename = "sample_image"  # Change this to your image file name without extension

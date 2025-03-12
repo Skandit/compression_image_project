@@ -88,10 +88,13 @@ def compress_image(image_path, output_path):
     if image is None:
         raise FileNotFoundError(f"Error: Unable to read image at {image_path}. Check the file path and integrity.")
 
-    diff_image = compute_difference_image(image)
+    # Reduce bit depth to 4-bit to improve compression efficiency
+    image = (image // 16) * 16
 
-    # Flatten and convert to string format for LZW
-    diff_string = ''.join([chr(val % 256) for val in diff_image.flatten()])
+        # Normalize difference values to avoid large variations
+    diff_image = compute_difference_image(image)
+    diff_string = ''.join([chr((val + 256) % 256) for val in diff_image.flatten()])
+
     lzw = LZWCompression()
     compressed_data = lzw.compress(diff_string)
 
@@ -108,8 +111,8 @@ def decompress_image(compressed_path, output_path, original_shape):
     lzw = LZWCompression()
     decompressed_string = lzw.decompress(compressed_data)
 
-    # Convert back to integer array
-    diff_image = np.array([ord(c) for c in decompressed_string], dtype=np.int16)
+    # Convert back to integer array with proper normalization
+    diff_image = np.array([(ord(c) - 256) % 256 for c in decompressed_string], dtype=np.int16)
     diff_image = diff_image.reshape(original_shape)
 
     restored_image = restore_original_image(diff_image)
@@ -118,7 +121,7 @@ def decompress_image(compressed_path, output_path, original_shape):
 
 
 if __name__ == "__main__":
-    input_image = ("sample_image.png")
+    input_image = "sample_image.png"
     compressed_file = "compressed.lzw"
     decompressed_image = "restored.png"
 

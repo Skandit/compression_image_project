@@ -121,9 +121,9 @@ def decompress_image(compressed_path, output_path, original_shape):
 
 
 if __name__ == "__main__":
-    input_image = "sample_image.png"
+    input_image = "sample_image.bmp"
     compressed_file = "compressed.lzw"
-    decompressed_image = "restored.png"
+    decompressed_image = "restored.bmp"
 
     compress_image(input_image, compressed_file)
     decompress_image(compressed_file, decompressed_image, (256, 256))

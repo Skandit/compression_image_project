@@ -11,7 +11,7 @@ class LZWCode:
 
     def compress_text_file(self):
         current_directory = os.path.dirname(os.path.realpath(__file__))
-        input_file = self.filename + '.txt'
+        input_file = self.filename + '.bmp'
         input_path = current_directory + '/' + input_file
         output_file = self.filename + '.bin'
         output_path = current_directory + '/' + output_file
@@ -178,63 +178,58 @@ class LZWCode:
             int_codes.append(int_code)
 
         return int_codes
-
+    
     def encode_pic(self, uncompressed_data):
 
-         dict_size = 256
-         dictionary = {tuple([i]): i for i in range(dict_size)}
-
-         w = [uncompressed_data[0]]
-         result = []
-
-         for k in uncompressed_data[1:]:
-            pixel_sequence = w + [k]
-            if tuple(pixel_sequence) in dictionary:
-               w = pixel_sequence
-            else:
-               result.append(dictionary[tuple(w)])
-               dictionary[tuple(pixel_sequence)] = dict_size
-               dict_size += 1
-               w = [k]
-
-         if w:
-            result.append(dictionary[tuple(w)])
-
-         self.codelength = math.ceil(math.log2(len(dictionary)))
-
-         return result
+        dict_size = 256
+        dictionary = {tuple([i]): i for i in range(dict_size)}
+        w = [uncompressed_data[0]]
+        result = []
+        for k in uncompressed_data[1:]:
+           pixel_sequence = w + [k]
+           if tuple(pixel_sequence) in dictionary:
+              w = pixel_sequence
+           else:
+              result.append(dictionary[tuple(w)])
+              dictionary[tuple(pixel_sequence)] = dict_size
+              dict_size += 1
+              w = [k]
+        if w:
+           result.append(dictionary[tuple(w)])
+        self.codelength = math.ceil(math.log2(len(dictionary)))
+        return result
 
 
     def decode_pic(self, encoded_values):
 
-      dict_size = 256
-      dictionary = {i: [i] for i in range(dict_size)}
-
-
-      w = dictionary[encoded_values.pop(0)]
-      result = w.copy()
-
-
-      for k in encoded_values:
-         if k in dictionary:
-            entry = dictionary[k]
-         elif k == dict_size:
-            entry = w + [w[0]]
-         else:
-            raise ValueError(f'Bad compressed k: {k}')
-
-         result.extend(entry)  # Add the entry to the result
-
-         # Add w + first value of entry to the dictionary
-         dictionary[dict_size] = w + [entry[0]]
-         dict_size += 1
-
-         w = entry  # Update w to the current entry
-
-      # Convert the result to a 2D numpy array
-      side_length = int(np.sqrt(len(result)))  # Assuming the image is square-shaped
-      return np.array(result).reshape((side_length, side_length))
-
+        dict_size = 256
+        dictionary = {i: [i] for i in range(dict_size)}
+  
+  
+        w = dictionary[encoded_values.pop(0)]
+        result = w.copy()
+  
+  
+        for k in encoded_values:
+           if k in dictionary:
+              entry = dictionary[k]
+           elif k == dict_size:
+              entry = w + [w[0]]
+           else:
+              raise ValueError(f'Bad compressed k: {k}')
+  
+           result.extend(entry)  # Add the entry to the result
+  
+           # Add w + first value of entry to the dictionary
+           dictionary[dict_size] = w + [entry[0]]
+           dict_size += 1
+  
+           w = entry  # Update w to the current entry
+  
+        # Convert the result to a 2D numpy array
+        side_length = int(np.sqrt(len(result)))  # Assuming the image is square-shaped
+        return np.array(result).reshape((side_length, side_length))
+  
 
 
 

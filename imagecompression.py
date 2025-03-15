@@ -10,7 +10,7 @@ class ImageCompression:
 
     def compress_image(self):
         """Compress an image using LZW algorithm and save the binary file."""
-        input_path = self.filename + '.png'  # Ensure PNG format
+        input_path = self.filename + '.bmp'  # Ensure PNG format
         output_path = self.filename + '.bin'
         shape_path = self.filename + '_shape.npy'  # Save original shape
 
@@ -49,7 +49,7 @@ class ImageCompression:
         """Decompress an LZW-compressed binary file and restore the image."""
         input_path = self.filename + '.bin'
         shape_path = self.filename + '_shape.npy'
-        output_path = self.filename + '_restored.png'
+        output_path = self.filename + '_restored.bmp'
 
         # Load compressed data and original shape
         with open(input_path, "rb") as f:
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     decompressed_file = compressor.decompress_image()
 
     # Compare original and decompressed images
-    original_image = Image.open(filename + ".png").convert('L')
+    original_image = Image.open(filename + ".bmp").convert('L')
     decompressed_image = Image.open(decompressed_file).convert('L')
 
     original_array = np.array(original_image)

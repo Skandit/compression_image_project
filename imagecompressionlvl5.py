@@ -120,15 +120,15 @@ class LZWImageCompression:
         b_channel = self.restore_from_differences(decompressed_channels[2])
         
         decompressed_image = cv2.merge([r_channel, g_channel, b_channel])
-        cv2.imwrite(output_path, decompressed_image, [cv2.IMWRITE_BMP])
+        cv2.imwrite(output_path, decompressed_image)
         print(f"BMP Image successfully decompressed and restored using difference encoding, saved to {output_path}")
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "thumbs_up.bmp"  # Change this to your input BMP image
+    image_path = "thumbs_up.bmp"
     compressed_output = "compressed_image.npz"
     decompressed_output = "thumbs_updecompressedforlvl5.bmp"
-    
+       
     if not os.path.exists(image_path):
         print(f"Error: File '{image_path}' does not exist. Please check the file path.")
     else:
